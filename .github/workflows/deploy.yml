@@ -49,7 +49,8 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: ./${{ matrix.service == 'web' && 'apps/web' || matrix.service == 'api' && 'services/api' || 'workers/renderer' }}
+        context: .
+        file: ./${{ matrix.service == 'web' && 'apps/web' || matrix.service == 'api' && 'services/api' || 'workers/renderer' }}/Dockerfile
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
