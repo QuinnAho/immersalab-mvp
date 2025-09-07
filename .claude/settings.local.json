@@ -11,7 +11,8 @@
       "Bash(docker system prune:*)",
       "Bash(npm run build:*)",
       "Bash(bash:*)",
-      "Bash(docker:*)"
+      "Bash(docker:*)",
+      "Bash(npm run lint)"
     ],
     "deny": [],
     "ask": []

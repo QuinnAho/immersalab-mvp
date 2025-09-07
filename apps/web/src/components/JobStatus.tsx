@@ -32,6 +32,8 @@ export default function JobStatus({ job, onJobUpdate }: JobStatusProps) {
     }
 
     const pollInterval = setInterval(async () => {
+      if (!isPolling) return;
+      
       try {
         const response = await fetch(`/api/jobs/${job.id}`);
         if (response.ok) {
@@ -53,7 +55,7 @@ export default function JobStatus({ job, onJobUpdate }: JobStatusProps) {
     }, 3000); // Poll every 3 seconds
 
     return () => clearInterval(pollInterval);
-  }, [job.id, job.status, onJobUpdate]);
+  }, [job.id, job.status, onJobUpdate, isPolling]);
 
   const getStatusColor = () => {
     switch (job.status) {
