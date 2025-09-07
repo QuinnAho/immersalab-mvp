@@ -12,7 +12,9 @@
       "Bash(npm run build:*)",
       "Bash(bash:*)",
       "Bash(docker:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
