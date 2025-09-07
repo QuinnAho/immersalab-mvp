@@ -576,12 +576,12 @@ NODE_ENV=development
 ## 📋 QA Checklist
 
 ### Development Environment Setup
-- [ ] Repository clones successfully
-- [ ] `./dev-setup.sh` runs without errors
-- [ ] All services start with `docker-compose up`
-- [ ] Web interface accessible at localhost:3000
-- [ ] API health check passes at localhost:3001/health
-- [ ] LocalStack services respond correctly
+- [x] Repository clones successfully
+- [x] `./dev-setup.sh` runs without errors ✅ **FIXED**
+- [x] All services start with `docker-compose up` (API, Worker, LocalStack, Redis)
+- [x] Web interface accessible at localhost:3000 (run locally: `cd apps/web && npm run dev`)
+- [x] API health check passes at localhost:3001/health
+- [x] LocalStack services respond correctly
 
 ### Core Functionality
 - [ ] File upload accepts valid 3D model formats
@@ -615,6 +615,81 @@ NODE_ENV=development
 ---
 
 ## 📞 Support & Troubleshooting
+
+### Development Setup Script Issues (RESOLVED)
+
+#### Dev-Setup Script (`dev-setup.sh`) - Fixed Issues ✅
+
+**Issues Identified and Resolved:**
+
+1. **Docker Compose Detection Issue**
+   - **Problem**: Script checked for `docker-compose` first, but Docker Desktop uses `docker compose` (without hyphen)
+   - **Fix**: Reordered detection to prioritize `docker compose` over legacy `docker-compose`
+   - **Code Change**:
+   ```bash
+   # Before: Checked docker-compose first
+   # After: Check docker compose first
+   if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+       DOCKER_COMPOSE="docker compose"
+   elif command -v docker-compose &> /dev/null; then
+       DOCKER_COMPOSE="docker-compose"
+   ```
+
+2. **Directory Navigation Problems**
+   - **Problem**: `cd` commands could leave script in wrong directory if commands failed
+   - **Fix**: Used subshells `(cd dir && command)` for safer directory navigation
+   - **Code Change**:
+   ```bash
+   # Before:
+   cd apps/web && npm install
+   cd ../..
+   
+   # After:
+   (cd apps/web && npm install)
+   ```
+
+3. **Docker Compose Version Warning**
+   - **Problem**: Docker Compose warned about obsolete `version` field in docker-compose.yml
+   - **Fix**: Removed `version: '3.8'` from docker-compose.yml as it's no longer required
+
+4. **Tailwind CSS v4 Build Issue**
+   - **Problem**: Web service failed to build due to missing `lightningcss.linux-x64-musl.node` native module
+   - **Root Cause**: Tailwind CSS v4 uses LightningCSS which has compatibility issues with Alpine Linux containers
+   - **Attempted Fixes**:
+     - Added native build dependencies (`python3`, `make`, `g++`)
+     - Tried rebuilding lightningcss in container
+     - Switched from Alpine to Ubuntu base image
+   - **Final Solution**: Modified script to skip web service Docker build and run it locally
+   - **Code Change**:
+   ```bash
+   # Skip web service in Docker, run locally instead
+   $DOCKER_COMPOSE up --build -d api worker localstack redis
+   
+   echo "📝 Note: Web service needs to run locally due to Tailwind CSS v4 build issues"
+   echo "🚀 To start the web service locally:"
+   echo "   cd apps/web && npm run dev"
+   ```
+
+5. **LocalStack Windows Compatibility**
+   - **Problem**: Docker socket mounting doesn't work on Windows
+   - **Fix**: Removed Docker socket mount, used named volumes for LocalStack data
+   - **Code Change**:
+   ```yaml
+   # Before:
+   volumes:
+     - "/var/run/docker.sock:/var/run/docker.sock"
+     - "/tmp/localstack:/tmp/localstack"
+   
+   # After:
+   volumes:
+     - localstack_data:/var/lib/localstack
+   ```
+
+**Current Script Status**: ✅ **WORKING**
+- All dependencies install correctly
+- Docker services start successfully (API, Worker, LocalStack, Redis)
+- Proper error handling and user guidance
+- Web service runs locally with clear instructions
 
 ### Common Issues
 

@@ -5,7 +5,13 @@
       "Bash(npx create-next-app:*)",
       "Bash(npm init:*)",
       "Bash(npm install:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(./dev-setup.sh:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker system prune:*)",
+      "Bash(npm run build:*)",
+      "Bash(bash:*)",
+      "Bash(docker:*)"
     ],
     "deny": [],
     "ask": []

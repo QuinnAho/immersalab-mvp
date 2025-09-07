@@ -1,10 +1,8 @@
-version: '3.8'
-
 services:
   web:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/web/Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -12,14 +10,14 @@ services:
     depends_on:
       - api
     volumes:
-      - ./apps/web:/app
-      - /app/node_modules
-      - /app/.next
+      - ./apps/web:/app/apps/web
+      - /app/apps/web/node_modules
+      - /app/apps/web/.next
 
   api:
     build:
-      context: ./services/api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./services/api/Dockerfile
     ports:
       - "3001:3001"
     environment:
@@ -36,8 +34,8 @@ services:
 
   worker:
     build:
-      context: ./workers/renderer
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./workers/renderer/Dockerfile
     environment:
       - AWS_REGION=us-east-1
       - SQS_QUEUE_URL=${SQS_QUEUE_URL}
@@ -58,11 +56,9 @@ services:
     environment:
       - SERVICES=s3,sqs
       - DEBUG=1
-      - DATA_DIR=/tmp/localstack/data
-      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DATA_DIR=/var/lib/localstack
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/tmp/localstack:/tmp/localstack"
+      - localstack_data:/var/lib/localstack
 
   # Redis for caching and session management (optional)
   redis:
@@ -74,3 +70,4 @@ services:
 
 volumes:
   redis_data:
+  localstack_data:

@@ -16,7 +16,7 @@ export const pollForMessages = async (): Promise<RenderMessage | null> => {
       QueueUrl: queueUrl,
       MaxNumberOfMessages: 1,
       WaitTimeSeconds: 20, // Long polling
-      VisibilityTimeoutSeconds: 300 // 5 minutes to process
+      VisibilityTimeout: 300 // 5 minutes to process
     });
 
     const result = await sqsClient.send(command);

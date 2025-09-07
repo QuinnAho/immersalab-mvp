@@ -5,24 +5,28 @@ WORKDIR /app
 # Install ffmpeg and other dependencies
 RUN apk add --no-cache ffmpeg wget
 
-# Copy package files
+# Use root workspace lockfile for deterministic installs
 COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Provide the worker package manifest so npm can resolve the workspace
+COPY workers/renderer/package.json ./workers/renderer/package.json
 
-# Copy source code
-COPY . .
+# Install only the renderer workspace (includes dev deps for build)
+RUN npm ci --include-workspace-root=false --workspace renderer
+
+# Copy source code and shared dependencies
+COPY workers/renderer/ ./workers/renderer/
+COPY shared/ ./shared/
 
 # Build the application
+WORKDIR /app/workers/renderer
 RUN npm run build
+
+# Remove dev dependencies to reduce image size
+RUN npm prune --omit=dev
 
 # Create directories for Glint CLI and assets
 RUN mkdir -p /app/glint /app/assets/inputs /app/assets/outputs
-
-# Download Glint CLI (placeholder - will be updated with actual download URL)
-# RUN wget -O /app/glint/glint-cli <GLINT_CLI_DOWNLOAD_URL>
-# RUN chmod +x /app/glint/glint-cli
 
 # Add Glint CLI to PATH
 ENV PATH="/app/glint:${PATH}"
