@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    depends_on:
+      - api
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - AWS_REGION=us-east-1
+      - SQS_QUEUE_URL=${SQS_QUEUE_URL}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+    depends_on:
+      - localstack
+    volumes:
+      - ./services/api:/app
+      - /app/node_modules
+      - /app/dist
+
+  worker:
+    build:
+      context: ./workers/renderer
+      dockerfile: Dockerfile
+    environment:
+      - AWS_REGION=us-east-1
+      - SQS_QUEUE_URL=${SQS_QUEUE_URL}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+    depends_on:
+      - localstack
+    volumes:
+      - ./workers/renderer:/app
+      - /app/node_modules
+      - /app/dist
+
+  # LocalStack for local AWS services development
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      - SERVICES=s3,sqs
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/tmp/localstack:/tmp/localstack"
+
+  # Redis for caching and session management (optional)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

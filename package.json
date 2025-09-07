@@ -1,0 +1,30 @@
+{
+  "name": "immersalab-mvp",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*", 
+    "workers/*",
+    "engine/*"
+  ],
+  "scripts": {
+    "dev": "pnpm run --parallel dev",
+    "build": "pnpm run --recursive build",
+    "clean": "pnpm run --recursive clean",
+    "web:dev": "pnpm --filter web dev",
+    "api:dev": "pnpm --filter api dev",
+    "worker:dev": "pnpm --filter renderer dev",
+    "logs": "./scripts/logs.sh",
+    "logs:follow": "./scripts/logs.sh -f",
+    "logs:errors": "./scripts/logs.sh -e",
+    "logs:progress": "./scripts/logs.sh -p -f",
+    "monitor": "./scripts/monitor.sh",
+    "monitor:realtime": "./scripts/monitor.sh -r",
+    "monitor:summary": "./scripts/monitor.sh -s",
+    "monitor:jobs": "./scripts/monitor.sh -j"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

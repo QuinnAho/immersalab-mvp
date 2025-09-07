@@ -1,0 +1,23 @@
+FROM ubuntu:22.04
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    ffmpeg \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create glint directory
+RUN mkdir -p /opt/glint
+
+# Download and install Glint CLI (placeholder)
+# RUN wget -O /opt/glint/glint-cli <GLINT_CLI_DOWNLOAD_URL>
+# RUN chmod +x /opt/glint/glint-cli
+
+# Add to PATH
+ENV PATH="/opt/glint:${PATH}"
+
+WORKDIR /workspace
+
+# This image will be used as a base for the worker
+CMD ["bash"]
