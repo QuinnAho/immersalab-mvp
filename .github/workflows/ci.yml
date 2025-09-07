@@ -76,7 +76,8 @@ jobs:
     - name: Build Docker image
       uses: docker/build-push-action@v5
       with:
-        context: ./${{ matrix.service == 'web' && 'apps/web' || matrix.service == 'api' && 'services/api' || 'workers/renderer' }}
+        context: .
+        file: ./${{ matrix.service == 'web' && 'apps/web' || matrix.service == 'api' && 'services/api' || 'workers/renderer' }}/Dockerfile
         push: false
         tags: immersalab-${{ matrix.service }}:${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
